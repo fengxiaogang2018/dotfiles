@@ -1,5 +1,15 @@
+ 
+" help
 "
-" plug init
+" remap is an option that makes mappings work recursively
+" map is recursive version version, works in normal visual, select and operator.
+" noremap is non-recursive version.
+" nmap works in normal mode.
+" vmap works in visual mode.
+
+
+"
+" auto load for first time uses
 "
 if empty(glob('~/.config/nvim/autoload/plug.vim'))
 	silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
@@ -8,14 +18,6 @@ if empty(glob('~/.config/nvim/autoload/plug.vim'))
 endif
 
 
-"map c a 在map生效的情况下，按下c就等同于按下了a
-"noremap 不会递归的映射
-"<C-A> ctrl + A
-"set 设置的是选项
-"let 设置的是变量
-
-
-let mapleader=" " "将前缀定义为空格
 
 "
 "外观
@@ -44,7 +46,6 @@ set shiftwidth=4
 set softtabstop=4
 set autoindent
 set expandtab "敲入tab时自动将其转化为空格
-set paste
 
 
 
@@ -55,84 +56,180 @@ set hlsearch 	"高亮搜索
 set ignorecase 	"忽略大小写
 set smartcase 	"只能匹配
 set incsearch 	"动态搜索
-exec "nohlsearch" 
-"进入vim时取消之前的搜索高亮
 noremap [ Nzz 	"匹配之后按[上一个 
 noremap ] nzz	"匹配之后按]下一个 
 noremap <LEADER><CR> :nohlsearch<CR> "按空格+回车取消高亮
 
 
-noremap J 5j
-noremap K 5k
 
 
+"===
+"=== Basic Mappings
+"===
 
-map S :w<CR> "保存
-map Q :q<CR> "退出
-map R :source $MYVIMRC<CR> "更新
+" Set <LEADER> as <SPACE>
+let mapleader=" " "将前缀定义为空格
 
-map sl :set splitright<CR>:vsplit<CR> "右边分屏
-map sh :set nosplitright<CR>:vsplit<CR> "左边分屏
-map sj :set splitbelow<CR>:split<CR> "下边分屏
-map sk :set nosplitbelow<CR>:split<CR> "上边分屏
+" Save & quit
+noremap S :w<CR>
+noremap Q :q<CR>
 
-map <LEADER>h <C-w>h 
-map <LEADER>j <C-w>j 
-map <LEADER>k <C-w>k 
-map <LEADER>l <C-w>l 
+" Source vimrc file anytime
+noremap R :source $MYVIMRC<CR>
 
+" Open the vimrc file anytime
+noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
+
+"===
+"=== Window management
+"===
+
+" split the screens to up (horizontal), down (horizontal), left(vertical),right(vertical)
+map sl :set splitright<CR>:vsplit<CR>
+map sh :set nosplitright<CR>:vsplit<CR>
+map sj :set splitbelow<CR>:split<CR>
+map sk :set nosplitbelow<CR>:split<CR>
+
+
+" Use <space> + new arrow keys for moving the cursor around windows
+noremap <LEADER>h <C-w>h 
+noremap <LEADER>j <C-w>j 
+noremap <LEADER>k <C-w>k 
+noremap <LEADER>l <C-w>l 
+
+" Resize splits with arrow keys
 map <up> :res +5<CR>
 map <down> :res -5<CR>
 map <left> :vertical resize -5<CR>
 map <right> :vertical resize +5<CR>
 
-map tn :tabe<CR>
-map th :tabnext<CR>
-map tl :tabprevious<CR>
+" Place the two screens
+noremap cz <C-w>t<C-w>H "切换成垂直分屏
+noremap sp <C-w>t<C-w>K "切换成水平分屏
 
-map cz <C-w>t<C-w>H "切换成垂直分屏
-map sp <C-w>t<C-w>K "切换成水平分屏
+" indentation
+nnoremap < <<
+nnoremap > >>
 
+"===
+"=== Tab management
+"===
+
+" Create a new tab with tn
+noremap tn :tabe<CR>
+noremap th :tabnext<CR>
+noremap tl :tabprevious<CR>
+
+
+
+" make Y to copy till the end of the line
+nnoremap Y y$
 
 "
-" plug
+" Cursor Movement
 "
-"
+" J/K for 5 times j/k (faster navigation)
+noremap J 5j
+noremap K 5k
+
+" H key:go to the start of the line
+noremap H 0
+" L key:go to the end of the line
+noremap L $
+
+" Press <SPACE> + q to close the window below the current window
+noremap <LEADER>q <C-w>j:q<CR>
+
+
+"===
+"=== Other useful stuff
+"===
+
+" Opening a terminal window
+noremap <LEADER>/ :term<CR>
+
+" find and replace
+noremap \s :%s//g<left><left>
+
+" Compile function
+noremap r :call CompileRunGcc()<CR>
+func! CompileRunGcc()
+    exec "w"
+	if &filetype == 'c'
+		exec "!g++ % -o %<"
+		exec "!time ./%<"
+	elseif &filetype == 'cpp'
+		set splitbelow
+		exec "!g++ -std=c++11 % -Wall -o %<"
+		:sp
+		:res -15
+		:term ./%<
+	elseif &filetype == 'sh'
+		:!time bash %
+	endif
+endfunc
+
+"=
+"= Install Plugins with Vim-Plug
+"=
 
 call plug#begin('~/.config/nvim/plugged')
 
 Plug 'connorholyday/vim-snazzy'
 Plug 'vim-airline/vim-airline'
+
+" Auto Complete
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
+
+" Undo Tree
+Plug 'mbbill/undotree'
+
+
 
 call plug#end()
 
+" =============Start of Plugint Settings ===============
+
+
 "
-"snazzy
+" snazzy
 "
 colorscheme snazzy
 let g:SnazzyTransparent = 1
 
+
 "
-" coc
+" Coc
 "
 
-" if hidden is not set, TextEdit might fail
-set hidden
 
-" Some servers have issues with backup files.
-set nobackup
-set nowritebackup
 
-" Better display for messages
-set cmdheight=2
 
-" You will have bad experience for diagnostic messages when it's default 40000.
-set updatetime=300
 
-" don't give |ins-completion-menu| messages.
-set shortmess+=c
 
-" always show signcolumns
-set signcolumn=yes
+"
+" Undotree
+"
+noremap L :UndotreeToggle<CR>
+let g:undotree_DiffAutoOpen = 1
+let g:undotree_SetFocusWhenToggle = 1
+let g:undotree_ShortIndicators = 1
+let g:undotree_WindowLayout = 2
+let g:undotree_DiffpanelHeight = 8
+let g:undotree_SplitWidth = 24
+function g:Undotree_CustomMap()
+	nmap <buffer> u <plug>UndotreeNextState
+	nmap <buffer> e <plug>UndotreePreviousState
+	nmap <buffer> U 5<plug>UndotreeNextState
+	nmap <buffer> E 5<plug>UndotreePreviousState
+endfunc
 
+
+
+" =============End of Plugint Settings ===============
+
+"=
+"= Necessary Commands to Execute
+"=
+
+exec "nohlsearch" 
