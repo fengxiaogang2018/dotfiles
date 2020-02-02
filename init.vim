@@ -1,64 +1,44 @@
- 
-" help
-"
-" remap is an option that makes mappings work recursively
-" map is recursive version version, works in normal visual, select and operator.
-" noremap is non-recursive version.
-" nmap works in normal mode.
-" vmap works in visual mode.
 
 
 "
-" auto load for first time uses
+" System
 "
-if empty(glob('~/.config/nvim/autoload/plug.vim'))
-	silent !curl -fLo ~/.config/nvim/autoload/plug.vim --create-dirs
-				\ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-	autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-endif
-
+let &t_ut=''
+set autochdir
 
 
 "
-"外观
+" Editor behavior
 "
-syntax on "开启语法高亮
+syntax on
 set encoding=utf-8
-set scrolloff=5 "确保程序上下都有5行
-set number "显示行号
-set relativenumber "显示相对行号
-set cursorline "显示光标行
-set wrap "自动折行
-set showcmd "命令行显示输入命令
-set wildmenu "底部命令补全
-set listchars=tab:▸\ ,trail:■ "如果行尾有多余的空格（包括Tab键）,该配置将这些空格显示成可见的小方块。
+set scrolloff=5
+set number
+set relativenumber
+set cursorline
+set wrap
+set showcmd
+set wildmenu
+set listchars=tab:▸\ ,trail:■
 set list
-
-
-
-"
-"缩进
-"
 set cindent
-"能够很好的识别出C和Java等结构话程序语言，并能用C语言格式缩进来处理程序的缩进
 set tabstop=4
 set shiftwidth=4
 set softtabstop=4
 set autoindent
-set expandtab "敲入tab时自动将其转化为空格
-
-
+set expandtab
+set splitright
+set splitbelow
+set updatetime=100
 
 "
 "搜索相关
 "
-set hlsearch 	"高亮搜索
-set ignorecase 	"忽略大小写
-set smartcase 	"只能匹配
-set incsearch 	"动态搜索
-noremap [ Nzz 	"匹配之后按[上一个 
-noremap ] nzz	"匹配之后按]下一个 
-noremap <LEADER><CR> :nohlsearch<CR> "按空格+回车取消高亮
+set hlsearch
+set ignorecase
+set smartcase
+set incsearch
+noremap <LEADER><CR> :nohlsearch<CR>
 
 
 
@@ -68,7 +48,7 @@ noremap <LEADER><CR> :nohlsearch<CR> "按空格+回车取消高亮
 "===
 
 " Set <LEADER> as <SPACE>
-let mapleader=" " "将前缀定义为空格
+let mapleader=" "
 
 " Save & quit
 noremap S :w<CR>
@@ -80,9 +60,19 @@ noremap R :source $MYVIMRC<CR>
 " Open the vimrc file anytime
 noremap <LEADER>rc :e ~/.config/nvim/init.vim<CR>
 
+" Open Starify
+map <LEADER>st :Startify<CR>
+
+" Find two consecutive identical characters
+map <space>fw /\(\<\w\+\>\)\_s*\1
+
+
 "===
 "=== Window management
 "===
+
+" Disabling the default s key
+noremap s <nop>
 
 " split the screens to up (horizontal), down (horizontal), left(vertical),right(vertical)
 map sl :set splitright<CR>:vsplit<CR>
@@ -92,10 +82,10 @@ map sk :set nosplitbelow<CR>:split<CR>
 
 
 " Use <space> + new arrow keys for moving the cursor around windows
-noremap <LEADER>h <C-w>h 
-noremap <LEADER>j <C-w>j 
-noremap <LEADER>k <C-w>k 
-noremap <LEADER>l <C-w>l 
+noremap <LEADER>h <C-w>h
+noremap <LEADER>j <C-w>j
+noremap <LEADER>k <C-w>k
+noremap <LEADER>l <C-w>l
 
 " Resize splits with arrow keys
 map <up> :res +5<CR>
@@ -104,12 +94,10 @@ map <left> :vertical resize -5<CR>
 map <right> :vertical resize +5<CR>
 
 " Place the two screens
-noremap cz <C-w>t<C-w>H "切换成垂直分屏
-noremap sp <C-w>t<C-w>K "切换成水平分屏
+noremap cz <C-w>t<C-w>H
+noremap sp <C-w>t<C-w>K
 
-" indentation
-nnoremap < <<
-nnoremap > >>
+
 
 "===
 "=== Tab management
@@ -120,17 +108,14 @@ noremap tn :tabe<CR>
 noremap th :tabnext<CR>
 noremap tl :tabprevious<CR>
 
-
-
-" make Y to copy till the end of the line
-nnoremap Y y$
-
-"
-" Cursor Movement
-"
+"=
+"= Cursor Movement
+"=
 " J/K for 5 times j/k (faster navigation)
 noremap J 5j
 noremap K 5k
+noremap W 5w
+noremap B 5b
 
 " H key:go to the start of the line
 noremap H 0
@@ -145,11 +130,13 @@ noremap <LEADER>q <C-w>j:q<CR>
 "=== Other useful stuff
 "===
 
-" Opening a terminal window
-noremap <LEADER>/ :term<CR>
+" indentation
+nnoremap < <<
+nnoremap > >>
 
 " find and replace
-noremap \s :%s//g<left><left>
+noremap <leader>r :%s//g<left><left>
+
 
 " Compile function
 noremap r :call CompileRunGcc()<CR>
@@ -169,22 +156,57 @@ func! CompileRunGcc()
 	endif
 endfunc
 
+" Opening a terminal window
+map <LEADER>t :set splitbelow<CR>:sp<CR>:term<CR>
+
+" Press space twice to jump to the next '<++>' and edit it
+map <LEADER><LEADER> <Esc>/<++><CR>:nohlsearch<CR>c4i
+
+" Spelling Check with <space>sc
+map <LEADER>sc :set spell!<CR>
+
+" Auto change directory to current dir
+autocmd BufEnter * silent! lcd %:p:h
+
+" Call figlet
+map tx :r !figlet
+
 "=
 "= Install Plugins with Vim-Plug
 "=
 
 call plug#begin('~/.config/nvim/plugged')
 
+" snazzy
 Plug 'connorholyday/vim-snazzy'
+
+" airline
 Plug 'vim-airline/vim-airline'
 
 " Auto Complete
 Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
+" Other visual enhancement
+Plug 'Yggdroot/indentLine'
+Plug 'mhinz/vim-startify'
+
 " Undo Tree
 Plug 'mbbill/undotree'
 
+" File navigation
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'junegunn/fzf.vim'
 
+
+" Taglist
+Plug 'majutsushi/tagbar', { 'on': 'TagbarOpenAutoClose' }
+
+
+" Markdown
+Plug 'dhruvasagar/vim-table-mode', { 'on': 'TableModeToggle' }
+Plug 'dkarter/bullets.vim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & npm install' }
 
 call plug#end()
 
@@ -196,6 +218,7 @@ call plug#end()
 "
 colorscheme snazzy
 let g:SnazzyTransparent = 1
+
 
 
 "
@@ -303,7 +326,7 @@ nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
 "
 " Undotree
 "
-noremap L :UndotreeToggle<CR>
+noremap <leader>u :UndotreeToggle<CR>
 let g:undotree_DiffAutoOpen = 1
 let g:undotree_SetFocusWhenToggle = 1
 let g:undotree_ShortIndicators = 1
@@ -317,7 +340,113 @@ function g:Undotree_CustomMap()
 	nmap <buffer> E 5<plug>UndotreePreviousState
 endfunc
 
+"
+" NERDTree
+"
+map <leader>n :NERDTreeToggle<CR>
+let NERDTreeMapOpenExpl = ""
+let NERDTreeMapUpdir = "H"
+let NERDTreeMapUpdirKeepOpen = "h"
+let NERDTreeMapOpenSplit = ""
+let NERDTreeMapOpenVSplit = "L"
+let NERDTreeMapActivateNode = "l"
+let NERDTreeMapOpenInTab = "o"
+let NERDTreeMapOpenInTabSilent = "O"
+let NERDTreeMapPreview = ""
+let NERDTreeMapCloseDir = ""
+let NERDTreeMapChangeRoot = "s"
+let NERDTreeMapMenu = ","
+let NERDTreeMapToggleHidden = "a"
 
+
+"
+" NERDTree-git
+"
+let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ "Unknown"   : "?"
+    \ }
+
+" ===
+" === Taglist           " 代码文件结构
+" ===
+map <silent> t :TagbarOpenAutoClose<CR>
+
+" ===
+" === FZF
+" ===
+map <leader>f :FZF<CR>
+
+
+
+" ===
+" === Startify
+" ===
+let g:startify_lists = [
+      \ { 'type': 'files',     'header': ['   MRU']            },
+      \ { 'type': 'bookmarks', 'header': ['   Bookmarks']      },
+      \ { 'type': 'commands',  'header': ['   Commands']       },
+      \ ]
+
+
+" ===
+" === indentLine 缩进线
+" ===
+let g:indentLine_char = '│'
+let g:indentLine_color_term = 238
+let g:indentLine_color_gui = '#333333'
+silent! unmap <LEADER>ig
+autocmd WinEnter * silent! unmap <LEADER>ig
+
+
+" ===
+" === vim-table-mode
+" ===
+map <LEADER>tm :TableModeToggle<CR>
+
+
+
+
+" ===
+" === Bullets.vim
+" ===
+let g:bullets_set_mappings = 0
+
+
+" ===
+" === MarkdownPreview
+" ===
+let g:mkdp_auto_start = 0
+let g:mkdp_auto_close = 1
+let g:mkdp_refresh_slow = 0
+let g:mkdp_command_for_global = 0
+let g:mkdp_open_to_the_world = 0
+let g:mkdp_open_ip = ''
+let g:mkdp_browser = 'google-chrome'
+let g:mkdp_echo_preview_url = 0
+let g:mkdp_browserfunc = ''
+let g:mkdp_preview_options = {
+    \ 'mkit': {},
+    \ 'katex': {},
+    \ 'uml': {},
+    \ 'maid': {},
+    \ 'disable_sync_scroll': 0,
+    \ 'sync_scroll_type': 'middle',
+    \ 'hide_yaml_meta': 1
+    \ }
+let g:mkdp_markdown_css = ''
+let g:mkdp_highlight_css = ''
+let g:mkdp_port = ''
+let g:mkdp_page_title = '「${name}」'
+
+nmap <leader>mp <Plug>MarkdownPreview
 
 " =============End of Plugint Settings ===============
 
