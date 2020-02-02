@@ -45,6 +45,8 @@ export FZF_PREVIEW_COMMAND='[[ $(file --mime {}) =~ binary ]] && echo {} is a bi
 
 # alias
 alias vim='nvim'
+alias vim='sudo nvim'
 alias s='neofetch'
+
 
 
